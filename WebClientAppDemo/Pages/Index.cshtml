@@ -1,0 +1,97 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+@if(Model.ProcessInfo != "")
+{
+    <h3 style="color:red">@Model.ProcessInfo</h3>
+}
+
+@if(Model.IsLoginRequired)
+{
+    <form asp-page-handler="Login" method="post">
+        <fieldset>
+            <legend>Welcome</legend>
+            <div>
+                <label for="User" style="width: 80px; color:royalblue">User</label>
+                <input type="text" name="User" value="Name" />
+            </div>
+            <div>
+                <label for="Password" style="width:80px; color:royalblue">Password</label>
+                <input type="password" name="Password" value="Password" />
+            </div>
+            <div>
+                <button class="btn btn-outline-primary">Login</button>
+            </div>
+        </fieldset>
+    </form>
+}
+else
+{
+        <form asp-page-handler="Logout" method="post">
+        <fieldset>
+            <legend>Welcome, @Model.Request.Cookies["username"]</legend>
+            <div>
+                <button class="btn btn-outline-primary" style="width:120px">Logout</button>
+            </div>
+        </fieldset>
+    </form>
+    @if (Model.Clients == null)
+    {
+        <form asp-page-handler="ShowClients" method="post">
+            <fieldset>
+                <div>
+                    <button class="btn btn-outline-primary" style="width:120px">Show Clients</button>
+                </div>
+            </fieldset>
+        </form>
+    }
+    else
+    {
+        <form asp-page-handler="HideClients" method="get">
+            <fieldset>
+                <div>
+                    <button class="btn btn-outline-primary" style="width:120px">Hide Clients</button>
+                </div>
+            </fieldset>
+        </form>
+        <table class="table table-striped table-hover">
+            <tr>
+                <th>Alias</th>
+                <th>Type</th>
+                <th>Status</th>
+            </tr>
+            @foreach(var cli in Model.Clients)
+            {
+                string CliType;
+                switch (cli.Type)
+                {
+                    case 0: CliType = "Company"; break;
+                    case 1: CliType = "Person"; break;
+                    default: CliType = "unknown: " + cli.Type.ToString(); break;
+                }
+                string CliStatus;
+                switch (cli.Status)
+                {
+                    case 0: CliStatus = "New"; break;
+                    case 1: CliStatus = "Active"; break;
+                    case 2: CliStatus = "Inactive"; break;
+                    default: CliStatus = "unknown: " + cli.Status.ToString(); break;
+                }
+                <tr>
+                    <td>@cli.Alias</td>
+                    <td>@CliType</td>
+                    <td>@CliStatus</td>
+                </tr>
+            }           
+        </table>
+    }
+    @*    <form asp-page-handler="AddClient" method="post">
+        <fieldset>
+            <div>
+                <button class="btn btn-outline-primary" style="width:120px">Add Client</button>
+            </div>
+        </fieldset>
+    </form>*@
+}
